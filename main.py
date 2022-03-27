@@ -26,7 +26,8 @@ def main():
     for file in glob.glob(junitGlob, recursive=True):
         junitReports[file] = junit.loadReport(file)
     junitMarkdown = junit_builder.buildMarkdown(junitReports)
-    print(junitMarkdown)
+
+    markdown = junitMarkdown + "\n\n" + cloverMarkdown
 
 
 if __name__ == "__main__":
