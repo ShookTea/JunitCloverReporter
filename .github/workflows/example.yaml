@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run action
-        uses: ShookTea/JunitCloverReporter@v0.1.1
+        uses: ShookTea/JunitCloverReporter@v0.1.2
         with:
           github_token: example
           clover: artifacts/folder2/clover.xml
