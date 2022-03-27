@@ -1,6 +1,7 @@
 import os
 from github import Github
 import glob
+import clover
 
 def main():
     token = os.environ["INPUT_GITHUB_TOKEN"]
@@ -12,7 +13,12 @@ def main():
 
     g = Github(token)
 
+    codeUrl = "https://github.com/" + repository + "/blob/" + commitSha
+
     cloverPath = os.path.join(workspace, cloverPath)
+    cloverReport = clover.loadReport(cloverPath)
+    cloverMarkdown = cloverReport.toMarkdownTable(codeUrl)
+
     junitGlob = os.path.join(workspace, junitGlob)
 
     with open(cloverPath, 'r') as f:
