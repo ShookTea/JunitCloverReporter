@@ -59,7 +59,11 @@ def buildDetailerErrorReportForFailure(node, type, testName, test, target):
     html = "<tr><td>" + type + "</td><td>" + test + "</td><td>" + target + "</td><td>" + testName + "</td></tr>"
     text = node.text.strip()
     if text != "":
-        text = "\n\n```\n" + text + "\n```\n"
+        summary = text.split("\n")[1]
+        shortSummary = summary[0:50]
+        if shortSummary != summary:
+            shortSummary += "..."
+        text = "<details><summary>" + shortSummary + "</summary>\n\n```\n" + text + "\n```\n</details>"
     html += "<tr><td colspan=4>" + text + "</td></tr>"
     return html
 
