@@ -9,6 +9,14 @@ inputs:
     description: "GitHub token"
     required: true
     default: ""
+  clover:
+    description: "Path/glob to Clover file"
+    required: true
+    default: "clover.xml"
+  junit:
+    description: "Path/glob to JUnit file"
+    required: true
+    default: "junit.xml"
 outputs: {}
 runs:
   using: "docker"
