@@ -1,14 +1,93 @@
+from __future__ import annotations
 import xml.etree.ElementTree as ET
 import os
 
 class CloverReport:
-    def __init__(self, groups):
+    def __init__(self, groups: list[CloverFileGroup]):
         self.groups = groups
+        self.groups.sort(key=lambda group: group.dirname)
+
+    def toMarkdownTable(self, topFileUrl):
+        return self.summary() + "\n<details><summary>Detailed coverage report</summary>" + self.buildTable(topFileUrl) + "</details>"
+
+    def summary(self):
+        methods = self.sumMethods()
+        statements = self.sumStatements()
+        methodPercent = "-"
+        statementPercent = "-"
+        if methods > 0:
+            methodPercent = "{:.2f}".format(100 * self.sumCoveredMethods() / methods) + "%"
+        if statements > 0:
+            statementPercent = "{:.2f}".format(100 * self.sumCoveredStatements() / statements) + "%"
+
+        return "### Testing coverage\n<b>Lines</b>: " + statementPercent + "\n<b>Methods:</b> " + methodPercent
+
+    def buildTable(self, topFileUrl):
+        table = "<table><thead><tr><th>File</th><th>Methods %</th><th>Lines %</th><th>Skipped lines</th></tr></thead><tbody>"
+        for entry in self.groups:
+            table += entry.buildTableGroup(topFileUrl)
+        return table + "</tbody></table>"
+
+    def sumMethods(self):
+        methods = 0
+        for entry in self.groups:
+            methods += entry.sumMethods()
+        return methods
+
+    def sumCoveredMethods(self):
+        coveredMethods = 0
+        for entry in self.groups:
+            coveredMethods += entry.sumCoveredMethods()
+        return coveredMethods
+
+    def sumStatements(self):
+        statements = 0
+        for entry in self.groups:
+            statements += entry.sumStatements()
+        return statements
+
+    def sumCoveredStatements(self):
+        coveredStatements = 0
+        for entry in self.groups:
+            coveredStatements += entry.sumCoveredStatements()
+        return coveredStatements
+
 
 class CloverFileGroup:
-    def __init__(self, entries, dirname):
+    def __init__(self, entries: list[CloverEntry], dirname):
         self.entries = entries
+        self.entries.sort(key=lambda entry: entry.basename)
         self.dirname = dirname
+
+    def buildTableGroup(self, topFileUrl):
+        rows = "<tr><td colspan=4><b>" + self.dirname + "</b></td></tr>"
+        for entry in self.entries:
+            rows += entry.buildTableRow(topFileUrl)
+        return rows
+
+    def sumMethods(self):
+        methods = 0
+        for entry in self.entries:
+            methods += entry.methods
+        return methods
+
+    def sumCoveredMethods(self):
+        coveredMethods = 0
+        for entry in self.entries:
+            coveredMethods += entry.coveredMethods
+        return coveredMethods
+
+    def sumStatements(self):
+        statements = 0
+        for entry in self.entries:
+            statements += entry.statements
+        return statements
+
+    def sumCoveredStatements(self):
+        coveredStatements = 0
+        for entry in self.entries:
+            coveredStatements += entry.coveredStatements
+        return coveredStatements
 
 class CloverEntry:
     def __init__(self, commonPath, basePath, file):
@@ -18,11 +97,28 @@ class CloverEntry:
         self.simpleDirname = dirname.replace(commonPath, basePath, 1)
 
         metrics = file.find("metrics")
-        self.methods = metrics.attrib["methods"]
-        self.coveredMethods = metrics.attrib["coveredmethods"]
-        self.statements = metrics.attrib["statements"]
-        self.coveredStatements = metrics.attrib["coveredstatements"]
+        self.methods = int(metrics.attrib["methods"])
+        self.coveredMethods = int(metrics.attrib["coveredmethods"])
+        self.statements = int(metrics.attrib["statements"])
+        self.coveredStatements = int(metrics.attrib["coveredstatements"])
         self.lineBlocks = self.loadLineBlocks(file)
+
+    def buildTableRow(self, topFileUrl):
+        entry = "<tr><td colspan=2><a href=\"" + topFileUrl + "/" + self.simpleDirname + "/" + self.basename + "\">" + self.basename + "</a></td>"
+
+        if self.methods > 0:
+            methodPercent = "{:.2f}".format(100 * self.coveredMethods / self.methods) + "%"
+            entry += "<td><b>" + methodPercent + "</b><br/>(" + str(self.coveredMethods) + " of " + str(self.methods) + ")</td>"
+        else:
+            entry += "<td>-</td>"
+
+        if self.statements > 0:
+            statementPercent = "{:.2f}".format(100 * self.coveredStatements / self.statements) + "%"
+            entry += "<td><b>" + statementPercent + "</b><br/>(" + str(self.coveredStatements) + " of " + str(self.statements) + ")</td>"
+        else:
+            entry += "<td>-</td>"
+
+        return entry + "</tr>"
 
     def loadLineBlocks(self, file):
         uncoveredLines = []
@@ -71,4 +167,4 @@ def loadReport(path):
     return CloverReport(groups)
 
 if __name__ == "__main__":
-    print(loadReport("/Users/shooktea/Projects/JunitCloverPublisher/artifacts/folder2/clover.xml"))
+    print(loadReport("/Users/shooktea/Projects/JunitCloverPublisher/artifacts/folder2/clover.xml").toMarkdownTable("https://github.com/Squirrafe/PhpCollections/blob/main"))
