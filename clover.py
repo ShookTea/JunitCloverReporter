@@ -154,6 +154,8 @@ def loadReport(path):
 
     entries = {}
     for file in root.find("project").findall("file"):
+        if file.find("class") is None:
+            continue
         entry = CloverEntry(commonPath, basePath, file)
         dirname = entry.simpleDirname
         if dirname not in entries:
