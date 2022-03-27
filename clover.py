@@ -104,7 +104,8 @@ class CloverEntry:
         self.lineBlocks = self.loadLineBlocks(file)
 
     def buildTableRow(self, topFileUrl):
-        entry = "<tr><td colspan=2><a href=\"" + topFileUrl + "/" + self.simpleDirname + "/" + self.basename + "\">" + self.basename + "</a></td>"
+        fileUrl = topFileUrl + "/" + self.simpleDirname + "/" + self.basename
+        entry = "<tr><td colspan><a href=\"" + fileUrl + "\">" + self.basename + "</a></td>"
 
         if self.methods > 0:
             methodPercent = "{:.2f}".format(100 * self.coveredMethods / self.methods) + "%"
@@ -118,7 +119,23 @@ class CloverEntry:
         else:
             entry += "<td>-</td>"
 
-        return entry + "</tr>"
+        return entry + self.buildLineBlocksCell(fileUrl) +  "</tr>"
+
+    def buildLineBlocksCell(self, fileUrl):
+        parts = []
+        for lineBlock in self.lineBlocks:
+            firstLine = lineBlock[0]
+            lastLine = lineBlock[len(lineBlock) - 1]
+            if firstLine == lastLine:
+                url = fileUrl + "#L" + str(firstLine)
+                text = str(firstLine)
+                parts.append("<a href=\"" + url + "\">" + text + "</a>")
+            else:
+                url = fileUrl + "#L" + str(firstLine) + "-L" + str(lastLine)
+                text = str(firstLine) + "-" + str(lastLine)
+                parts.append("<a href=\"" + url + "\">" + text + "</a>")
+
+        return "<td>" + ",".join(parts) + "</td>"
 
     def loadLineBlocks(self, file):
         uncoveredLines = []
