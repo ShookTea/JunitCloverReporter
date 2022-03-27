@@ -7,7 +7,7 @@ def buildMarkdown(units):
 
 def buildDetailedErrorReport(units):
     common = getCommonPath(units)
-    html = "<table><thead><tr><th>Type</th><th>Test</th><th>Target</th><th>Test name</th><th>Line</th></tr></thead><tbody>"
+    html = "<table><thead><tr><th>Type</th><th>Test</th><th>Target</th><th>Test name</th></tr></thead><tbody>"
     errorReportRows = ""
     for path in units:
         fileNameWithoutExt = Path(path).stem
@@ -29,7 +29,39 @@ def buildDetailedErrorReportForMainSuite(suite: junit.TestMainSuite, test, targe
     return result
 
 def buildDetailedErrorReportForFileSuite(suite: junit.TestFileSuite, test, target):
-    return ""
+    if suite.errors + suite.warnings + suite.failures + suite.skipped == 0:
+        return ""
+    return buildDetailedErrorReportForSuiteRoot(suite.root, test, target)
+
+def buildDetailedErrorReportForSuiteRoot(suite, test, target):
+    if suite.attrib["errors"] + suite.attrib["warnings"] + suite.attrib["failures"] + suite.attrib["skipped"] == "0000":
+        return ""
+    result = ""
+    name = suite.attrib["name"]
+    for child in suite.findall("testsuite"):
+        result += buildDetailedErrorReportForSuiteRoot(child, test, target)
+    for child in suite.findall("testcase"):
+        result += buildDetailedErrorReportForCaseRoot(child, name, test, target)
+    return result
+
+def buildDetailedErrorReportForCaseRoot(case, testName, test, target):
+    name = testName + "<br/>" + case.attrib["name"]
+    result = ""
+    for failure in case.findall("failure"):
+        result += buildDetailerErrorReportForFailure(failure, "failure :bangbang:", name, test, target)
+    for error in case.findall("error"):
+        result += buildDetailerErrorReportForFailure(error, "error :exclamation:", name, test, target)
+    for skipped in case.findall("skipped"):
+        result += buildDetailerErrorReportForFailure(skipped, "skipped :zzz:", name, test, target)
+    return result
+
+def buildDetailerErrorReportForFailure(node, type, testName, test, target):
+    html = "<tr><td>" + type + "</td><td>" + test + "</td><td>" + target + "</td><td>" + testName + "</td></tr>"
+    text = node.text.strip()
+    if text != "":
+        text = "\n\n```\n" + text + "\n```\n"
+    html += "<tr><td colspan=4>" + text + "</td></tr>"
+    return html
 
 def buildSummary(units):
     common = getCommonPath(units)

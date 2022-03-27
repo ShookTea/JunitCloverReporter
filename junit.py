@@ -45,3 +45,4 @@ class TestFileSuite:
         self.name = root.attrib["name"]
         self.dirname = dirname
         self.basename = basename
+        self.root = root
