@@ -3,7 +3,12 @@ from pathlib import Path
 import junit
 
 def buildMarkdown(units):
-    return buildDetailedErrorReport(units)
+    summary = buildSummary(units)
+    details = buildDetailedErrorReport(units)
+    markdown = "### Test results\n" + summary
+    if details != "":
+        markdown += "\n<details><summary>Errors list</summary>" + details + "</details>"
+    return markdown
 
 def buildDetailedErrorReport(units):
     common = getCommonPath(units)
