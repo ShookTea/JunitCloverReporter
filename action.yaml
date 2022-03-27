@@ -1,0 +1,12 @@
+name: "JUnit+Clover publisher"
+description: "Merges results from junit.xml and clover.xml and publishes as a comment in pull request"
+author: "Norbert Kowalik"
+inputs:
+  github_token:
+    description: "GitHub token"
+    required: true
+    default: ""
+outputs: {}
+runs:
+  using: "docker"
+  image: "Dockerfile"
