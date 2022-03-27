@@ -1,6 +1,9 @@
 name: "JUnit+Clover publisher"
 description: "Merges results from junit.xml and clover.xml and publishes as a comment in pull request"
 author: "Norbert Kowalik"
+branding:
+  icon: align-justify
+  color: purple
 inputs:
   github_token:
     description: "GitHub token"
