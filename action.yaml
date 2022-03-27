@@ -10,7 +10,7 @@ inputs:
     required: true
     default: ""
   clover:
-    description: "Path/glob to Clover file"
+    description: "Path to Clover file"
     required: true
     default: "clover.xml"
   junit:

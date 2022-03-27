@@ -4,7 +4,7 @@ import glob
 
 def main():
     token = os.environ["INPUT_GITHUB_TOKEN"]
-    cloverGlob = os.environ["INPUT_CLOVER"]
+    cloverPath = os.environ["INPUT_CLOVER"]
     junitGlob = os.environ["INPUT_JUNIT"]
     repository = os.environ["GITHUB_REPOSITORY"]
     commitSha = os.environ["GITHUB_SHA"]
