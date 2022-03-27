@@ -15,7 +15,6 @@ class TestMainSuite:
         self.failures = int(root.attrib["failures"])
         self.skipped = int(root.attrib["skipped"])
         self.time = float(root.attrib["time"])
-        self.name = root.attrib["name"]
         self.suites = []
 
         while root.find("testsuite") is not None and "file" not in root.find("testsuite").attrib:

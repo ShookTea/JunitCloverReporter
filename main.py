@@ -2,6 +2,8 @@ import os
 from github import Github
 import glob
 import clover
+import junit
+import junit_builder
 
 def main():
     token = os.environ["INPUT_GITHUB_TOKEN"]
@@ -20,19 +22,12 @@ def main():
     cloverMarkdown = cloverReport.toMarkdownTable(codeUrl)
 
     junitGlob = os.path.join(workspace, junitGlob)
-
-    with open(cloverPath, 'r') as f:
-        print("Clover content:")
-        print("============")
-        print(f.readlines())
-        print("============")
-
+    junitReports = {}
     for file in glob.glob(junitGlob, recursive=True):
-        with open(file, 'r') as f:
-            print("junit content in file " + file + ":")
-            print("----------------------------------")
-            print(f.readlines())
-            print("----------------------------------")
+        junitReports[file] = junit.loadReport(file)
+    junitMarkdown = junit_builder.buildMarkdown(junitReports)
+    print(junitMarkdown)
+
 
 if __name__ == "__main__":
     main()
