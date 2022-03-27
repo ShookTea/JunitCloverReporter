@@ -184,6 +184,3 @@ def loadReport(path):
         groups.append(CloverFileGroup(entries[dirname], dirname))
 
     return CloverReport(groups)
-
-if __name__ == "__main__":
-    print(loadReport("/Users/shooktea/Projects/JunitCloverPublisher/artifacts/folder2/clover.xml").toMarkdownTable("https://github.com/Squirrafe/PhpCollections/blob/main"))
