@@ -8,13 +8,25 @@ def main():
     junitGlob = os.environ["INPUT_JUNIT"]
     repository = os.environ["GITHUB_REPOSITORY"]
     commitSha = os.environ["GITHUB_SHA"]
-    workspace = os.environ["RUNNER_WORKSPACE"]
+    workspace = os.environ["GITHUB_WORKSPACE"]
 
     g = Github(token)
 
-    for file in os.listdir(workspace):
-        print(file)
+    cloverPath = os.path.join(workspace, cloverPath)
+    junitGlob = os.path.join(workspace, junitGlob)
 
+    with open(cloverPath, 'r') as f:
+        print("Clover content:")
+        print("============")
+        print(f.readlines())
+        print("============")
+
+    for file in glob.glob(junitGlob, recursive=True):
+        with open(file, 'r') as f:
+            print("junit content in file " + file + ":")
+            print("----------------------------------")
+            print(f.readlines())
+            print("----------------------------------")
 
 if __name__ == "__main__":
     main()
