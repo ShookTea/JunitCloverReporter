@@ -1,0 +1,16 @@
+name: Example workflow
+on:
+  push: ~
+  pull_request: ~
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run action
+        uses: ShookTea/JunitCloverReporter
+        with:
+          github_token: example
