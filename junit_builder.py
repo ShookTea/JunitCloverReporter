@@ -3,7 +3,33 @@ from pathlib import Path
 import junit
 
 def buildMarkdown(units):
-    return buildSummary(units)
+    return buildDetailedErrorReport(units)
+
+def buildDetailedErrorReport(units):
+    common = getCommonPath(units)
+    html = "<table><thead><tr><th>Type</th><th>Test</th><th>Target</th><th>Test name</th><th>Line</th></tr></thead><tbody>"
+    errorReportRows = ""
+    for path in units:
+        fileNameWithoutExt = Path(path).stem
+        groupName = os.path.dirname(path)[(len(common) + 1):]
+        result: junit.TestMainSuite = units[path]
+        errorReportRows += buildDetailedErrorReportForMainSuite(result, fileNameWithoutExt, groupName)
+
+    if errorReportRows == "":
+        return ""
+
+    return html + errorReportRows + "</tbody></table>"
+
+def buildDetailedErrorReportForMainSuite(suite: junit.TestMainSuite, test, target):
+    if suite.errors + suite.warnings + suite.failures + suite.skipped == 0:
+        return ""
+    result = ""
+    for filesuite in suite.suites:
+        result += buildDetailedErrorReportForFileSuite(filesuite, test, target)
+    return result
+
+def buildDetailedErrorReportForFileSuite(suite: junit.TestFileSuite, test, target):
+    return ""
 
 def buildSummary(units):
     common = getCommonPath(units)
