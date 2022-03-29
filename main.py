@@ -24,11 +24,18 @@ def main():
 
     codeUrl = "https://github.com/" + repository + "/blob/" + commitSha
     markdown = markdown_builder.buildMarkdown(codeUrl, workspace, cloverPath, junitGlob)
-
+    tail = "\n\n###### Built by JUnitCloverPublisher"
+    fullComment = markdown + tail
     g = github.Github(token)
+    current_user_id = g.get_user().id
     repo = g.get_repo(repository)
     for pull in iteratePullRequests(repo, commitSha):
         print(pull)
+        print("------")
+        for comment in pull.get_issue_comments():
+            if comment.user.id == current_user_id and comment.body.endswith(tail):
+                print(comment)
+        print("======")
 
 if __name__ == "__main__":
     main()
