@@ -6,24 +6,23 @@ from github.PullRequest import PullRequest
 
 def publish(markdown: str, token: str, commit: str, repo: str):
     g = github.Github(token)
-    currentUserId = g.get_user().id
     repo = g.get_repo(repo)
     for pull in iteratePullRequests(repo, commit):
-        publishForPull(pull, markdown, currentUserId)
+        publishForPull(pull, markdown)
 
 
-def publishForPull(pull: PullRequest, markdown: str, userId: int):
+def publishForPull(pull: PullRequest, markdown: str):
     tail = "\n\n###### Built by JUnitCloverPublisher"
     fullComment = markdown + tail
-    commentToBeUpdated = findCommentToBeUpdated(pull, tail, userId)
+    commentToBeUpdated = findCommentToBeUpdated(pull, tail)
     if commentToBeUpdated is None:
         pull.create_issue_comment(fullComment)
     else:
         commentToBeUpdated.edit(fullComment)
 
-def findCommentToBeUpdated(pull: PullRequest, tail: str, userId: int):
+def findCommentToBeUpdated(pull: PullRequest, tail: str):
     for comment in pull.get_issue_comments():
-        if comment.user.id == userId and comment.body.endswith(tail):
+        if comment.user.login == 'github-actions[bot]' and comment.body.endswith(tail):
             return comment
     return None
 
