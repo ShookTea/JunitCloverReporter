@@ -6,11 +6,13 @@ from github.PullRequest import PullRequest
 import markdown_builder
 
 
-def iteratePullRequests(repo: Repository) -> Generator[PullRequest, None, None]:
+def iteratePullRequests(repo: Repository, commit: str) -> Generator[PullRequest, None, None]:
     for pull in repo.get_pulls(state="open"):
-        yield pull
+        if pull.head.sha == commit:
+            yield pull
     for pull in repo.get_pulls(state="closed"):
-        yield pull
+        if pull.head.sha == commit:
+            yield pull
 
 def main():
     token = os.environ["INPUT_GITHUB_TOKEN"]
@@ -25,7 +27,7 @@ def main():
 
     g = github.Github(token)
     repo = g.get_repo(repository)
-    for pull in iteratePullRequests(repo):
+    for pull in iteratePullRequests(repo, commitSha):
         print(pull)
 
 if __name__ == "__main__":
