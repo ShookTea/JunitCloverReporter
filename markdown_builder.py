@@ -4,7 +4,7 @@ import clover
 import junit
 import junit_builder
 
-def buildMarkdown(codeUrl, workspace, cloverPath, junitGlob):
+def buildMarkdown(codeUrl, workspace, cloverPath, junitGlob, commitSha):
     cloverPath = os.path.join(workspace, cloverPath)
     cloverReport = clover.loadReport(cloverPath)
     cloverMarkdown = cloverReport.toMarkdownTable(codeUrl)
@@ -15,4 +15,4 @@ def buildMarkdown(codeUrl, workspace, cloverPath, junitGlob):
         junitReports[file] = junit.loadReport(file)
     junitMarkdown = junit_builder.buildMarkdown(junitReports)
 
-    return junitMarkdown + "\n\n" + cloverMarkdown
+    return "Reports for commit " + commitSha + "\n" + junitMarkdown + "\n\n" + cloverMarkdown
