@@ -1,6 +1,16 @@
 import os
-from github import Github
+from typing import Generator
+import github
+from github.Repository import Repository
+from github.PullRequest import PullRequest
 import markdown_builder
+
+
+def iteratePullRequests(repo: Repository) -> Generator[PullRequest, None, None]:
+    for pull in repo.get_pulls(state="open"):
+        yield pull
+    for pull in repo.get_pulls(state="closed"):
+        yield pull
 
 def main():
     token = os.environ["INPUT_GITHUB_TOKEN"]
@@ -10,11 +20,13 @@ def main():
     commitSha = os.environ["GITHUB_SHA"]
     workspace = os.environ["GITHUB_WORKSPACE"]
 
-    g = Github(token)
     codeUrl = "https://github.com/" + repository + "/blob/" + commitSha
     markdown = markdown_builder.buildMarkdown(codeUrl, workspace, cloverPath, junitGlob)
-    print(markdown)
 
+    g = github.Github(token)
+    repo = g.get_repo(repository)
+    for pull in iteratePullRequests(repo):
+        print(pull)
 
 if __name__ == "__main__":
     main()
