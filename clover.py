@@ -161,6 +161,7 @@ class CloverEntry:
 
 
 def loadReport(path):
+    print("Building Clover report for path " + path)
     tree = ET.parse(path)
     root = tree.getroot()
     paths = []

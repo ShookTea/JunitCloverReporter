@@ -3,6 +3,7 @@ from pathlib import Path
 import junit
 
 def buildMarkdown(units):
+    print("Merging " + str(len(units)) + " JUnit report(s)")
     summary = buildSummary(units)
     details = buildDetailedErrorReport(units)
     markdown = "### Test results\n" + summary

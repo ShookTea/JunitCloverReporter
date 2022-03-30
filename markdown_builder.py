@@ -5,6 +5,8 @@ import junit
 import junit_builder
 
 def buildMarkdown(codeUrl, workspace, cloverPath, junitGlob, commitSha):
+    print("Start building markdown for " + commitSha + " in " + codeUrl)
+
     cloverPath = os.path.join(workspace, cloverPath)
     cloverReport = clover.loadReport(cloverPath)
     cloverMarkdown = cloverReport.toMarkdownTable(codeUrl)

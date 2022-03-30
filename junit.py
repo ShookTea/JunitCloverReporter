@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import os
 
 def loadReport(path):
+    print("Building JUnit report for path " + path)
     tree = ET.parse(path)
     root = tree.getroot().find("testsuite")
     return TestMainSuite(root)
